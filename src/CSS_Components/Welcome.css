@@ -1,0 +1,134 @@
+.welcome-section {
+    min-height: 100vh;
+    background-image: url("/ImagenesP/FondoW.png" );
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+}
+
+.welcome-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7); /* Overlay oscuro para mejor legibilidad */
+}
+
+.welcome-content {
+    position: relative;
+    padding: 4rem 2rem;
+    text-align: center;
+    color: white;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.main-title {
+    font-size: 3.5rem;
+    color: #DC2626; /* Rojo para el título principal */
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.subtitle {
+    font-size: 2rem;
+    margin-bottom: 3rem;
+    color: white;
+}
+
+.description {
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    line-height: 1.6;
+}
+
+.description p {
+    margin: 0.5rem 0;
+}
+
+.discover-text {
+    font-size: 1.75rem;
+    margin: 2rem 0;
+    color: white;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    margin: 3rem 0;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #DC2626; /* Rojo para los números */
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 1rem;
+    color: white;
+}
+
+.register-btn {
+    padding: 1rem 2.5rem;
+    font-size: 1.25rem;
+    background-color: #DC2626;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.register-btn:hover {
+    background-color: #B91C1C;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 2.5rem;
+    }
+
+    .subtitle {
+        font-size: 1.5rem;
+    }
+
+    .description {
+        font-size: 1rem;
+    }
+
+    .discover-text {
+        font-size: 1.25rem;
+    }
+
+    .stats-container {
+        flex-direction: column;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .welcome-content {
+        padding: 2rem 1rem;
+    }
+
+    .main-title {
+        font-size: 2rem;
+    }
+
+    .subtitle {
+        font-size: 1.25rem;
+    }
+}

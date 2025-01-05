@@ -1,0 +1,107 @@
+.comment-section {
+    padding: 4rem 2rem;
+    background: url('/ImagenesP/FondoComentario.PNG') no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed;
+    position: relative;
+    /* Eliminamos el background-color de aquí */
+}
+
+/* Añadimos un pseudo-elemento para el overlay oscuro */
+.comment-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.8); /* Overlay más oscuro */
+    z-index: 1;
+}
+
+/* Aseguramos que el contenido esté por encima del overlay */
+.comment-container {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.comment-title {
+    color: white;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.rating {
+    margin-bottom: 2rem;
+}
+
+.rating span {
+    color: #DC2626;
+    font-size: 2rem;
+    cursor: pointer;
+    margin: 0 0.2rem;
+}
+
+.comment-input {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 1rem;
+    resize: vertical;
+    min-height: 120px;
+}
+
+.comment-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.submit-button {
+    padding: 1rem 4rem;
+    background-color: #DC2626;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #B91C1C;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+    .comment-container {
+        padding: 0 1rem;
+    }
+    
+    .comment-title {
+        font-size: 1.5rem;
+    }
+    
+    .rating span {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .comment-section {
+        padding: 2rem 1rem;
+    }
+    
+    .submit-button {
+        width: 100%;
+        padding: 0.8rem;
+    }
+}
