@@ -1,0 +1,55 @@
+.container {
+    font-family: Arial, sans-serif;
+  }
+  
+  .header {
+    text-align: center;
+    background-color: #d32f2f;
+    color: white;
+    padding: 20px;
+  }
+  
+  .historia {
+    text-align: center;
+    margin: 20px 0;
+  }
+  
+  .historia h2 {
+    color: #d32f2f;
+  }
+  
+  .mision-vision {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+  }
+  
+  .mision, .vision {
+    background-color: #f5b7b7;
+    padding: 20px;
+    border-radius: 10px;
+    width: 45%;
+    text-align: center;
+  }
+  
+  .mision img, .vision img {
+    width: 100px;
+    height: auto;
+    margin-top: 10px;
+  }
+  
+  .objetivos {
+    text-align: center;
+    margin: 20px;
+  }
+  
+  .objetivos ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .objetivos li {
+    margin: 5px 0;
+    font-weight: bold;
+  }
+  

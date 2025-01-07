@@ -21,7 +21,7 @@ const Header = () => {
           <a href="#articulos">Artículos</a>
           <a href="#ofertas">Ofertas</a>
           <a href="#contactos">Contactos</a>
-          <a href="#quienes-somos">Quiénes somos</a>
+          <a href="Quiensomos.jsx">Quiénes somos</a>
         </nav>
 
         {/* Auth Buttons */}
