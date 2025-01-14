@@ -6,6 +6,8 @@ import Off from './Components/Off'
 import Comenta from './Components/Comenta'
 import Footer from './Components/Footer'
 import Location from './Components/Location'
+import Articulos from './Components/Articulos'
+
 
 
 function App() {
@@ -18,7 +20,10 @@ function App() {
       <Comenta />
       <Location />
       <Footer />
+      <Articulos />
+     
     </>
+    
   )
 }
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import '../CSS_Components/Header.css'; 
 
+
 const Header = () => {
   return (
     <header className="header">
@@ -18,7 +19,7 @@ const Header = () => {
         {/* Navigation Links */}
         <nav className="nav-links">
           <a href="#inicio">Inicio</a>
-          <a href="#articulos">Artículos</a>
+          <a href="#Articulos">Artículos</a>
           <a href="#ofertas">Ofertas</a>
           <a href="#contactos">Contactos</a>
           <a href="Quiensomos.jsx">Quiénes somos</a>
