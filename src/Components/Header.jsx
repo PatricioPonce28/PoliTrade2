@@ -1,42 +1,38 @@
-import React from 'react';
-import '../CSS_Components/Header.css'; 
-
+import React from 'react'
+import { Link } from 'react-router-dom'
+import '../CSS_Components/Header.css'
 
 const Header = () => {
   return (
     <header className="header">
-      {/* Logo a la izquierda */}
       <div className="logo-container">
-        <img 
-          src="../ImagenesP/Logo1.png" 
-          alt="Logo" 
+        <img
+          src="../ImagenesP/Logo1.png"
+          alt="Logo"
           className="logo-image"
         />
       </div>
 
-      {/* Contenedor derecho para navegación y botones */}
       <div className="right-content">
-        {/* Navigation Links */}
         <nav className="nav-links">
-          <a href="#inicio">Inicio</a>
-          <a href="#Articulos">Artículos</a>
-          <a href="#ofertas">Ofertas</a>
-          <a href="#contactos">Contactos</a>
-          <a href="Quiensomos.jsx">Quiénes somos</a>
+          <Link to="/">Inicio</Link>
+          <Link to="/articulos">Artículos</Link>
+          <Link to="/ofertas">Ofertas</Link>
+          <Link to="/contactos">Contactos</Link>
+          <Link to="/quienes-somos">Quiénes somos</Link>
         </nav>
 
-        {/* Auth Buttons */}
         <div className="auth-buttons">
-          <button className="login-btn">
+          <Link to="/login" className="login-btn">
             Iniciar Sesión
-          </button>
-          <button className="register-btn">
+          </Link>
+          <Link to="/registro" className="register-btn">
             Regístrate
-          </button>
+          </Link>
         </div>
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

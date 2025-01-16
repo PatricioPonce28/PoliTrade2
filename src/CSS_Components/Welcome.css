@@ -88,7 +88,11 @@
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease; 
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+      
 }
 
 .register-btn:hover {

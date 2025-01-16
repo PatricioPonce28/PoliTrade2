@@ -47,27 +47,38 @@
 }
 
 /* Estilos para los botones */
-.auth-buttons {
-    display: flex;
-    gap: 1rem;
+.auth-buttons .login-btn,
+.auth-buttons .register-btn {
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
 }
 
-.login-btn {
-    padding: 0.5rem 1rem;
-    color: white;
-    border: 1px solid #DC2626;
-    border-radius: 0.25rem;
-    background: transparent;
-    cursor: pointer;
+.auth-buttons .login-btn {
+  color: #ff0000;
+  background: transparent;
+  border: 2px solid #ff0000;
+  margin-right: 10px;
+  transition: all 0.3s ease;
 }
 
-.register-btn {
-    padding: 0.5rem 1rem;
-    color: white;
-    background-color: #DC2626;
-    border: none;
-    border-radius: 0.25rem;
-    cursor: pointer;
+.auth-buttons .register-btn {
+  color: white;
+  background: #ff0000;
+  border: 2px solid #ff0000;
+  transition: all 0.3s ease;
+}
+
+.auth-buttons .login-btn:hover {
+  background: rgba(255, 0, 0, 0.1);
+}
+
+.auth-buttons .register-btn:hover {
+  background: #ff3333;
 }
 
 /* Media Queries */

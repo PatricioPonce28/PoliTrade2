@@ -238,7 +238,6 @@ const Articulos = () => {
       {Articulo_carrusel.map((categoria) => (
         <Categoria key={categoria.id} {...categoria} />
       ))}
-      <Footer />
     </div>
   );
 };

@@ -1,0 +1,128 @@
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                url('/ImagenesP/biblioteca-background.jpg') center/cover no-repeat;
+    padding: 20px;
+  }
+  
+  .login-form {
+    background-color: rgba(51, 51, 51, 0.95);
+    padding: 40px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .login-logo {
+    width: 100px;
+    height: auto;
+    display: block;
+    margin: 0 auto 20px;
+  }
+  
+  h1 {
+    color: #ff0000;
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+  
+  .login-subtitulo {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  label {
+    display: block;
+    color: white;
+    margin-bottom: 5px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    margin-top: 5px;
+  }
+  
+  input:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .recordar-container {
+    margin-bottom: 20px;
+  }
+  
+  .recordar-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+  }
+  
+  input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    cursor: pointer;
+  }
+  
+  .recordar-text {
+    color: white;
+    font-size: 0.9rem;
+  }
+  
+  .iniciar-sesion-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(to right, #ff0000, #ff4444);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  
+  .iniciar-sesion-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(to right, #ff1a1a, #ff5555);
+  }
+  
+  .registro-link {
+    text-align: center;
+    margin-top: 20px;
+    color: white;
+  }
+  
+  .registro-link a {
+    color: #ff0000;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .registro-link a:hover {
+    text-decoration: underline;
+  }
+  
+  @media (max-width: 480px) {
+    .login-form {
+      padding: 20px;
+    }
+    
+    h1 {
+      font-size: 1.8rem;
+    }
+  }

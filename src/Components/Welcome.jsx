@@ -1,8 +1,14 @@
 import React from 'react';
-import '../CSS_Components/Welcome.css'; 
-
+import { useNavigate } from 'react-router-dom';
+import '../CSS_Components/Welcome.css';
 
 const Welcome = () => {
+  const navigate = useNavigate();
+
+  const handleRegisterClick = () => {
+    navigate('/registro');
+  };
+
   return (
     <section className="welcome-section">
       <div className="welcome-content">
@@ -31,7 +37,12 @@ const Welcome = () => {
           </div>
         </div>
 
-        <button className="register-btn">Regístrate</button>
+        <button 
+          className="register-btn"
+          onClick={handleRegisterClick}
+        >
+          Regístrate
+        </button>
       </div>
     </section>
   );
