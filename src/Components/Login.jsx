@@ -19,7 +19,9 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí irá la lógica para enviar los datos del formulario
+
+    // Aquí irá la lógica para enviar los datos del formulario 
+    
     console.log('Datos del formulario:', formData);
   };
 
