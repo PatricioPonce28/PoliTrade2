@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
 import '../CSS_Components/Registrate.css';
 
 const Registrate = () => {
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
     nombres: '',
     apellidos: '',
@@ -19,10 +23,38 @@ const Registrate = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Aquí irá la lógica para enviar los datos del formulario
-    console.log('Datos del formulario:', formData);
+    setError('');
+
+    if (formData.contrasena !== formData.confirmarContrasena) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        formData.correo,
+        formData.contrasena
+      );
+      console.log('Usuario creado:', userCredential.user);
+      navigate('/login');
+    } catch (error) {
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          setError('Este correo ya está registrado');
+          break;
+        case 'auth/invalid-email':
+          setError('Correo electrónico inválido');
+          break;
+        case 'auth/weak-password':
+          setError('La contraseña debe tener al menos 6 caracteres');
+          break;
+        default:
+          setError('Error al crear la cuenta');
+      }
+    }
   };
 
   return (
@@ -38,6 +70,12 @@ const Registrate = () => {
         <p className="registro-subtitulo">
           Conecta con la comunidad politécnica y comienza a comerciar
         </p>
+
+        {error && (
+          <p className="error-message" style={{ color: 'red', textAlign: 'center' }}>
+            {error}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -67,7 +105,7 @@ const Registrate = () => {
           </div>
 
           <div className="form-group">
-            <label htmlFor="correo">Correo Institucional</label>
+            <label htmlFor="correo">Correo</label>
             <input
               type="email"
               id="correo"
@@ -88,6 +126,7 @@ const Registrate = () => {
                 value={formData.contrasena}
                 onChange={handleChange}
                 required
+                minLength="6"
               />
             </div>
 
@@ -100,6 +139,7 @@ const Registrate = () => {
                 value={formData.confirmarContrasena}
                 onChange={handleChange}
                 required
+                minLength="6"
               />
             </div>
           </div>

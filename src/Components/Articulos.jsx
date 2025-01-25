@@ -1,7 +1,7 @@
 import React from 'react';
-import Header from './Header'; // Asegúrate de que el componente Header exista
-import Categoria from './Categoria'; // Asegúrate de que el componente Categoria exista
-import Footer from './Footer'; // Asegúrate de que el componente Footer exista
+import Header from './Header'; 
+import Categoria from './Categoria'; 
+import Footer from './Footer'; 
 import "../CSS_Components/articulos.css"
 const Articulos = () => {
   const Articulo_carrusel = [
