@@ -11,6 +11,7 @@ import Articulos from './Components/Articulos'
 import QuienesSomos from './Components/Quiensomos'
 import Login from './Components/Login'
 import Registrate from './Components/Registrate'
+import Dashboard from './Components/Dashboard'
 
 const HomePage = () => {
   return (
@@ -24,25 +25,65 @@ const HomePage = () => {
   )
 }
 
+// Componente para páginas que requieren Header y Footer
+const LayoutWithHeaderFooter = ({ children }) => {
+  return (
+    <>
+      <Header />
+      {children}
+      <Footer />
+    </>
+  )
+}
+
 function App() {
   return (
     <Router>
-      <Header />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/articulos" element={<Articulos />} />
-        <Route path="/ofertas" element={<Off />} />
-        <Route path="/contactos" element={<Location />} />
-        <Route path="/quienes-somos" element={<QuienesSomos />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/registro" element={<Registrate />} />
+        {/* Rutas con Header y Footer */}
+        <Route path="/" element={
+          <LayoutWithHeaderFooter>
+            <HomePage />
+          </LayoutWithHeaderFooter>
+        } />
+        <Route path="/articulos" element={
+          <LayoutWithHeaderFooter>
+            <Articulos />
+          </LayoutWithHeaderFooter>
+        } />
+        <Route path="/ofertas" element={
+          <LayoutWithHeaderFooter>
+            <Off />
+          </LayoutWithHeaderFooter>
+        } />
+        <Route path="/contactos" element={
+          <LayoutWithHeaderFooter>
+            <Location />
+          </LayoutWithHeaderFooter>
+        } />
+        <Route path="/quienes-somos" element={
+          <LayoutWithHeaderFooter>
+            <QuienesSomos />
+          </LayoutWithHeaderFooter>
+        } />
+        <Route path="/login" element={
+          <LayoutWithHeaderFooter>
+            <Login />
+          </LayoutWithHeaderFooter>
+        } />
+        <Route path="/registro" element={
+          <LayoutWithHeaderFooter>
+            <Registrate />
+          </LayoutWithHeaderFooter>
+        } />
+
+        {/* Rutas sin Header y Footer */}
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
-      <Footer />
     </Router>
   )
 }
 
 export default App
-
 
 

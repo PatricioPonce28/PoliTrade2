@@ -33,12 +33,11 @@ const Login = () => {
       );
       
       if (formData.recordar) {
-        // Implementar persistencia de sesión
         localStorage.setItem('userEmail', formData.correo);
       }
 
       console.log('Usuario autenticado:', userCredential.user);
-      navigate('/dashboard'); // Ajusta esta ruta según tu aplicación
+      navigate('../Dashboard'); // Ajusta esta ruta según tu aplicación
     } catch (error) {
       switch (error.code) {
         case 'auth/user-not-found':
