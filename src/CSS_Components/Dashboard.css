@@ -220,3 +220,58 @@ h2, h3 {
 .delete-button:hover {
   background-color: #444;
 }
+
+@media (max-width: 1024px) {
+  .dashboard-container {
+    padding: 0 10px;
+  }
+
+  .crud-section {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+/* Dispositivos móviles */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .user-welcome {
+    margin-bottom: 10px;
+  }
+
+  .search-section {
+    width: 100%;
+  }
+
+  .crud-section {
+    grid-template-columns: 1fr;
+  }
+
+  .buttons-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Teléfonos pequeños */
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 0 5px;
+  }
+
+  .dashboard-header {
+    padding: 8px;
+  }
+
+  .logout-button {
+    width: 100%;
+    text-align: center;
+  }
+
+  .crud-button {
+    width: 100%;
+  }
+}
