@@ -5,6 +5,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;  /* Asegura que ocupe toda la pantalla */
+    z-index: 1000; /* Coloca el header sobre otros elementos */
 }
 
 /* Logo alineado a la izquierda */
