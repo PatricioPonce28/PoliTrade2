@@ -74,6 +74,7 @@ main > * {
 @media (max-width: 768px) {
   .app-container {
       padding: 0 10px;
+      
   }
 }
 

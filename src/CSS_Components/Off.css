@@ -122,5 +122,10 @@
 
     .offers-section {
         padding: 2rem 1rem;
+        
+    }
+    .offers-section .offers-title{
+        padding: 2rem;
+
     }
 }

@@ -7,7 +7,7 @@
 
 body {
     background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(32, 32, 32, 0.8)),
-                      url('../../public/img_articulos/FondoBody1.avif');
+                      url('../../img_articulos/FondoBody1.avif');
     background-size: cover;
     background-position: center;
     background-attachment: fixed; 

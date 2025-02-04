@@ -23,7 +23,7 @@ export default defineConfig({
       },
       workbox: {
         runtimeCaching: [
-          { urlPattern: /.*\.(html|js|css|png|jpg|jpeg|svg|webp)/, handler: 'CacheFirst' }
+          { urlPattern: /.*\.(html|js|css|png|jpg|jpeg|svg|webp|avif)/, handler: 'CacheFirst' }
         ]
       }
     }),

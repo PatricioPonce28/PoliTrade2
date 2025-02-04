@@ -9,15 +9,7 @@
     top: 0;
     left: 0;
     width: 100%;  /* Asegura que ocupe toda la pantalla */
-    z-index: 1000; /* Coloca el header sobre otros elementos */
-}
-.header {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    height: auto !important;
-    overflow-x: auto !important;
-    white-space: nowrap !important;
+    
 }
 
 
@@ -94,10 +86,7 @@
     background: #ff3333;
 }
 
-/* 🔥 IMPORTANTE: Asegura que el contenido no quede cubierto en móviles */
-.spacer {
-    height: 100px; /* Ajusta según el tamaño del header */
-}
+
 
 /* 🔹 Ajustes específicos para móviles */
 @media (max-width: 768px) {
