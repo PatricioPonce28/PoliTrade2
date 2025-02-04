@@ -1,16 +1,13 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import '../CSS_Components/Header.css'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import '../CSS_Components/Header.css';
+import logo from '/ImagenesP/Logo1.png'; // 🔹 Cambia esto
 
 const Header = () => {
   return (
     <header className="header">
       <div className="logo-container">
-        <img
-          src="../ImagenesP/Logo1.png"
-          alt="Logo"
-          className="logo-image"
-        />
+        <img src={logo} alt="Logo" className="logo-image" /> {/* ✅ Ahora la imagen cargará bien */}
       </div>
 
       <div className="right-content">
@@ -23,16 +20,13 @@ const Header = () => {
         </nav>
 
         <div className="auth-buttons">
-          <Link to="/login" className="login-btn">
-            Iniciar Sesión
-          </Link>
-          <Link to="/registro" className="register-btn">
-            Regístrate
-          </Link>
+          <Link to="/login" className="login-btn">Iniciar Sesión</Link>
+          <Link to="/registro" className="register-btn">Regístrate</Link>
         </div>
       </div>
     </header>
-  )
-}
+     
+  );
+};
 
-export default Header
+export default Header;

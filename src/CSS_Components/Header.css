@@ -11,6 +11,15 @@
     width: 100%;  /* Asegura que ocupe toda la pantalla */
     z-index: 1000; /* Coloca el header sobre otros elementos */
 }
+.header {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    height: auto !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+}
+
 
 /* Logo alineado a la izquierda */
 .logo-container {
@@ -85,76 +94,51 @@
     background: #ff3333;
 }
 
-/* Media Queries */
-
-/* Para Tablets */
-@media (max-width: 1024px) {
-    .right-content {
-        gap: 1rem;
-    }
-    
-    .nav-links {
-        gap: 1rem;
-    }
+/* 🔥 IMPORTANTE: Asegura que el contenido no quede cubierto en móviles */
+.spacer {
+    height: 100px; /* Ajusta según el tamaño del header */
 }
 
-/* Para móviles grandes */
+/* 🔹 Ajustes específicos para móviles */
 @media (max-width: 768px) {
     .header {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
+        flex-direction: row;
+        justify-content: space-between;
+        height: auto;  /* ⚠️ Cambiado de fijo a auto para evitar ocultar elementos */
+        padding: 0.5rem; /* Reduce padding para ganar espacio */
+        overflow-x: auto; /* 🔥 Permite desplazamiento horizontal si es necesario */
+        white-space: nowrap; /* 🔥 Evita que los enlaces se dividan en varias líneas */
     }
 
     .right-content {
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        width: 100%;
-    }
-    
-    .logo-container {
-        width: 100%;
-        display: flex;
-        justify-content: center;
-        margin-bottom: 1rem;
+        gap: 0.5rem; /* Reduce espacio entre elementos */
+        width: auto;
     }
 
     .nav-links {
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem;
+        flex-direction: row;
+        flex-wrap: nowrap; /* 🚀 Asegura que los enlaces se mantengan en una sola línea */
+        overflow-x: auto; /* 🔥 Permite desplazamiento si no caben */
+        gap: 0.5rem;
+    }
+
+    .nav-links a {
+        font-size: 0.9rem; /* ⚠️ Reduce el tamaño de los enlaces en móviles */
+        padding: 5px; /* Ajusta el padding para que ocupen menos */
     }
 
     .auth-buttons {
-        flex-direction: column;
-        width: 100%;
+        flex-direction: row;
         gap: 0.5rem;
     }
 
     .auth-buttons .login-btn,
     .auth-buttons .register-btn {
-        width: 90%;
-        padding: 10px;
+        width: auto;
+        padding: 5px 10px;
+        font-size: 0.8rem; /* 🔥 Reduce tamaño para ganar espacio */
     }
 }
 
-/* Para teléfonos pequeños */
-@media (max-width: 480px) {
-    .header {
-        padding: 0.5rem;
-    }
-
-    .logo-image {
-        width: 50px;
-        height: 50px;
-    }
-
-    .nav-links {
-        gap: 0.5rem;
-    }
-
-    .auth-buttons .login-btn,
-    .auth-buttons .register-btn {
-        font-size: 0.9rem;
-    }
-}
