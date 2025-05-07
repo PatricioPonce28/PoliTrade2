@@ -79,15 +79,20 @@ select option {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
+  align-items: start; /* Cambiado de flex-start a start */
 }
 
 .crud-card {
-  background-color: rgba(255, 255, 255, 0.95); 
+  background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  padding: 25px;
+  padding: 25px 25px 15px;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   transition: transform 0.3s ease;
+  height: 100%; /* Asegura que ocupe todo el espacio disponible */
+  min-height: auto; /* Evita crecimiento no deseado */
+  display: flex;
+  flex-direction: column;
 }
 
 .crud-card:hover {
@@ -140,6 +145,8 @@ textarea {
   font-weight: bold;
   font-size: 1rem;
   border: none;
+  margin: auto;
+  width: fit-content;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -152,8 +159,11 @@ textarea {
 }
 
 .publicaciones-grid {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 15px;
+  max-height: 100%; /* Controla el crecimiento */
+  overflow-y: auto; /* Scroll si hay muchas publicaciones */
 }
 
 .publicacion-item {
@@ -220,6 +230,27 @@ h2, h3 {
 .delete-button:hover {
   background-color: #444;
 }
+
+.crud-card form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.crud-card:first-child {
+  position: sticky;
+  top: 20px;
+  height: fit-content; /* Altura según contenido */
+  max-height: 90vh; /* Máximo altura de pantalla */
+  overflow-y: auto; /* Scroll interno si es necesario */
+}
+
+/* PUBLICACIONES (Card derecho) */
+.crud-card:last-child {
+  height: auto;
+  min-height: 0;
+}
+
 
 @media (max-width: 1024px) {
   .dashboard-container {
