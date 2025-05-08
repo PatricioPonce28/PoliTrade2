@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase';
-import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, where, getDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, where } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import '../CSS_Components/Dashboard.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
   const [publicaciones, setPublicaciones] = useState([]);
   const [allPublicaciones, setAllPublicaciones] = useState([]);
   const [busqueda, setBusqueda] = useState('');
@@ -18,6 +17,8 @@ const Dashboard = () => {
     categoria: ''
   });
   const [editando, setEditando] = useState(null);
+  const [joke, setJoke] = useState(null);
+  const [loadingJoke, setLoadingJoke] = useState(false);
   const db = getFirestore();
 
   useEffect(() => {
@@ -26,7 +27,7 @@ const Dashboard = () => {
         setUser(user);
         cargarPublicaciones();
         cargarTodasLasPublicaciones();
-        cargarPerfilUsuario(user.uid);
+        fetchRandomJoke(); // Cargar un chiste aleatorio al inicio
       } else {
         navigate('/login');
       }
@@ -34,28 +35,29 @@ const Dashboard = () => {
     return () => unsubscribe();
   }, [navigate]);
 
-  // Nueva función para cargar el perfil del usuario, incluyendo la imagen facial
-  const cargarPerfilUsuario = async (userId) => {
+  // Función para obtener un chiste aleatorio de la API
+  const fetchRandomJoke = async () => {
     try {
-      // Buscar en la colección "usuarios" donde esté almacenado el perfil
-      const userDoc = await getDoc(doc(db, 'usuarios', userId));
+      setLoadingJoke(true);
+      const response = await fetch('https://v2.jokeapi.dev/joke/Programming,Miscellaneous?safe-mode');
+      const data = await response.json();
       
-      if (userDoc.exists()) {
-        setUserProfile(userDoc.data());
+      if (data.type === 'single') {
+        setJoke({
+          setup: data.joke,
+          delivery: ""
+        });
       } else {
-        // Buscar por consulta si no se encuentra por ID
-        const userQuery = query(
-          collection(db, 'usuarios'),
-          where('userId', '==', userId)
-        );
-        
-        const querySnapshot = await getDocs(userQuery);
-        if (!querySnapshot.empty) {
-          setUserProfile(querySnapshot.docs[0].data());
-        }
+        setJoke({
+          setup: data.setup,
+          delivery: data.delivery
+        });
       }
+      
+      setLoadingJoke(false);
     } catch (error) {
-      console.error('Error al cargar perfil de usuario:', error);
+      console.error("Error al cargar chiste:", error);
+      setLoadingJoke(false);
     }
   };
 
@@ -81,6 +83,7 @@ const Dashboard = () => {
     }
   };
 
+  // Esta es la función que faltaba
   const handleCerrarSesion = async () => {
     try {
       await auth.signOut();
@@ -143,21 +146,7 @@ const Dashboard = () => {
       <div className="dashboard-container">
         <div className="dashboard-header">
           <div className="user-welcome">
-            {/* Sección modificada para mostrar la imagen facial si existe */}
-            <div className="user-profile">
-              {userProfile && userProfile.imagenFacial ? (
-                <img 
-                  src={userProfile.imagenFacial} 
-                  alt="Imagen facial" 
-                  className="user-facial-image" 
-                />
-              ) : (
-                <div className="user-avatar">
-                  {user?.email?.charAt(0).toUpperCase()}
-                </div>
-              )}
-              <p>Bienvenido, {user?.email}</p>
-            </div>
+            <p>Bienvenido, {user?.email}</p>
           </div>
           <button onClick={handleCerrarSesion} className="logout-button">
             Cerrar Sesión
@@ -235,6 +224,53 @@ const Dashboard = () => {
                   {editando ? 'Actualizar' : 'Crear'} Publicación
                 </button>
               </form>
+            </div>
+
+            {/* Sección del chiste - Justo después del formulario de crear publicación */}
+            <div 
+              style={{
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
+                padding: '20px',
+                margin: '20px 0'
+              }}
+            >
+              <h3 style={{color: 'red', textAlign: 'center', marginTop: 0}}>¡Chiste para desarrolladores!</h3>
+              
+              {loadingJoke ? (
+                <p style={{textAlign: 'center'}}>Cargando chiste...</p>
+              ) : joke ? (
+                <div
+                  style={{
+                    padding: '15px',
+                    backgroundColor: '#f5f5f5',
+                    borderRadius: '6px',
+                    margin: '15px 0'
+                  }}
+                >
+                  <p><strong>{joke.setup}</strong></p>
+                  {joke.delivery && <p style={{marginTop: '15px', fontWeight: 'bold'}}>{joke.delivery}</p>}
+                </div>
+              ) : (
+                <p>No se pudo cargar el chiste.</p>
+              )}
+              
+              <button 
+                onClick={fetchRandomJoke} 
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+                disabled={loadingJoke}
+              >
+                Nuevo chiste
+              </button>
             </div>
 
             <div className="crud-card">

@@ -238,7 +238,6 @@ h2, h3 {
 }
 
 .crud-card:first-child {
-  position: sticky;
   top: 20px;
   height: fit-content; /* Altura según contenido */
   max-height: 90vh; /* Máximo altura de pantalla */
@@ -249,6 +248,69 @@ h2, h3 {
 .crud-card:last-child {
   height: auto;
   min-height: 0;
+}
+.joke-container {
+  grid-column: 1; 
+  order: 2; 
+  position: relative; 
+  margin-top: 20px;
+  margin-bottom: 20px;
+  z-index: 1;
+}
+
+.joke-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  padding: 20px;
+  margin: 20px 0;
+  width: 100%;
+  position: relative;
+}
+
+.joke-card h3 {
+  margin-top: 0;
+  color: #2196F3;
+  text-align: center;
+}
+
+.joke-content {
+  padding: 15px;
+  background-color: #f5f5f5;
+  border-radius: 6px;
+  margin: 15px 0;
+}
+
+.joke-loading {
+  text-align: center;
+  color: #666;
+  padding: 15px;
+}
+
+.joke-delivery {
+  margin-top: 15px;
+  font-weight: bold;
+  color: #333;
+}
+
+.refresh-joke-btn {
+  width: 100%;
+  padding: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.refresh-joke-btn:hover {
+  background-color: #388E3C;
+}
+
+.refresh-joke-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 
