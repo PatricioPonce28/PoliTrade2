@@ -5,9 +5,9 @@ import { auth } from '../firebase';
 import '../CSS_Components/Registrate.css';
 
 // Obtener las variables de entorno para la API de Face++
-const FACE_API_KEY = import.meta.env.REACT_APP_FACE_API_KEY;
-const FACE_API_SECRET = import.meta.env.REACT_APP_FACE_API_SECRET;
-const FACE_API_ENDPOINT = import.meta.env.REACT_APP_FACE_API_ENDPOINT || 'https://api-us.faceplusplus.com/facepp/v3';
+const FACE_API_KEY = import.meta.env?.REACT_APP_FACE_API_KEY;
+const FACE_API_SECRET = import.meta.env?.REACT_APP_FACE_API_SECRET;
+const FACE_API_ENDPOINT = import.meta.env?.REACT_APP_FACE_API_ENDPOINT || 'https://api-us.faceplusplus.com/facepp/v3';
 
 const Registrate = () => {
   const navigate = useNavigate();
