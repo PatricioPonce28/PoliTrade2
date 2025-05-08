@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import '../CSS_Components/Registrate.css';
 
 // Obtener las variables de entorno para la API de Face++
-const FACE_API_KEY = import.meta.env?.REACT_APP_FACE_API_KEY;
-const FACE_API_SECRET = import.meta.env?.REACT_APP_FACE_API_SECRET;
+const FACE_API_KEY = import.meta.env?.REACT_APP_FACE_API_KEY || '1wXvLKJrR4vSyyBMEf58aw4MG9_XMb3I';
+const FACE_API_SECRET = import.meta.env?.REACT_APP_FACE_API_SECRET || 'sCzhzgXyqz8gY8X99Xe-jKjBJYhjFbPJk0fg';
 const FACE_API_ENDPOINT = import.meta.env?.REACT_APP_FACE_API_ENDPOINT || 'https://api-us.faceplusplus.com/facepp/v3';
 
 const Registrate = () => {
@@ -15,6 +15,11 @@ const Registrate = () => {
   const [facialId, setFacialId] = useState('');
   const [isFaceRegistered, setIsFaceRegistered] = useState(false);
   const [isCapturing, setIsCapturing] = useState(false);
+  const [stream, setStream] = useState(null);
+  const [capturedImage, setCapturedImage] = useState(null);
+  
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   
   const [formData, setFormData] = useState({
     nombres: '',
@@ -32,114 +37,104 @@ const Registrate = () => {
     }));
   };
 
-  // Función para capturar imagen desde la cámara
-  const captureImage = async () => {
+  // Iniciar la cámara cuando se hace clic en el botón
+  const startCamera = async () => {
+    if (!formData.correo || !formData.nombres) {
+      setError('Por favor complete el correo y nombres antes del registro facial');
+      return;
+    }
+    
+    setIsCapturing(true);
+    setError('');
+    
     try {
-      setIsCapturing(true);
       console.log("Solicitando acceso a la cámara...");
-      
-      // Especificar más opciones para la cámara
-      const constraints = {
+      const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640 },
           height: { ideal: 480 },
-          facingMode: "user"  // Cámara frontal
+          facingMode: "user"
         }
-      };
-      
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      console.log("Acceso a la cámara concedido:", stream);
-      
-      // Crear elementos para mostrar vista previa
-      const videoPreview = document.createElement('video');
-      videoPreview.srcObject = stream;
-      videoPreview.className = 'camera-preview';
-      videoPreview.setAttribute('autoplay', 'true');
-      videoPreview.setAttribute('playsinline', 'true');  // Importante para iOS
-      
-      const previewContainer = document.getElementById('camera-container');
-      if (!previewContainer) {
-        console.error("No se encontró el contenedor de la cámara");
-        throw new Error('CONTAINER_NOT_FOUND');
-      }
-      
-      previewContainer.innerHTML = '';
-      previewContainer.appendChild(videoPreview);
-      
-      // Esperar a que el video se cargue
-      return new Promise((resolve) => {
-        videoPreview.onloadedmetadata = async () => {
-          try {
-            await videoPreview.play();
-            console.log("Video reproduciendo correctamente");
-            
-            // Esperar un poco para que la cámara se estabilice
-            await new Promise(resolveTimer => setTimeout(resolveTimer, 1000));
-            
-            const canvas = document.createElement('canvas');
-            canvas.width = videoPreview.videoWidth;
-            canvas.height = videoPreview.videoHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
-            
-            // Detener el stream de la cámara
-            stream.getTracks().forEach(track => track.stop());
-            
-            // Mostrar la imagen capturada
-            const capturedImg = document.createElement('img');
-            capturedImg.src = canvas.toDataURL('image/jpeg');
-            capturedImg.className = 'captured-image';
-            previewContainer.innerHTML = '';
-            previewContainer.appendChild(capturedImg);
-            
-            setIsCapturing(false);
-            console.log("Imagen capturada exitosamente");
-            resolve(canvas.toDataURL('image/jpeg').split(',')[1]);
-          } catch (error) {
-            console.error("Error durante la captura:", error);
-            setIsCapturing(false);
-            throw error;
-          }
-        };
-        
-        videoPreview.onerror = (error) => {
-          console.error("Error al cargar el video:", error);
-          setIsCapturing(false);
-          throw error;
-        };
       });
-    } catch (error) {
-      setIsCapturing(false);
-      console.error("Error al capturar imagen:", error);
       
-      if (error.name === 'NotAllowedError') {
-        alert('Permiso de cámara denegado. Por favor, permita el acceso a la cámara.');
-        throw new Error('PERMISSION_REFUSED');
-      } else if (error.name === 'NotFoundError') {
-        alert('No se ha encontrado cámara en este dispositivo.');
-        throw new Error('CAMERA_NOT_FOUND');
-      } else if (error.name === 'NotReadableError') {
-        alert('La cámara está siendo utilizada por otra aplicación.');
-        throw new Error('CAMERA_IN_USE');
+      if (videoRef.current) {
+        videoRef.current.srcObject = mediaStream;
+        setStream(mediaStream);
+        console.log("Cámara iniciada correctamente");
+      } else {
+        console.error("Elemento de video no encontrado");
+        throw new Error("Elemento de video no encontrado");
+      }
+    } catch (err) {
+      console.error("Error al iniciar la cámara:", err);
+      
+      if (err.name === 'NotAllowedError') {
+        setError('Permiso de cámara denegado. Por favor, permita el acceso a la cámara y recargue la página.');
+      } else if (err.name === 'NotFoundError') {
+        setError('No se encontró una cámara en este dispositivo.');
+      } else if (err.name === 'NotReadableError') {
+        setError('La cámara está en uso por otra aplicación.');
+      } else {
+        setError('Error al acceder a la cámara: ' + err.message);
       }
       
-      alert('Error al acceder a la cámara: ' + error.message);
-      throw error;
+      setIsCapturing(false);
     }
+  };
+
+  // Capturar la imagen
+  const takePhoto = () => {
+    if (!videoRef.current || !canvasRef.current || !stream) {
+      console.error("No se puede capturar la foto: video, canvas o stream no disponible");
+      return null;
+    }
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    
+    // Establecer dimensiones del canvas según el video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    
+    // Dibujar el frame actual del video en el canvas
+    const context = canvas.getContext('2d');
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    // Obtener la imagen como base64
+    const imageDataUrl = canvas.toDataURL('image/jpeg');
+    setCapturedImage(imageDataUrl);
+    
+    // Detener el stream de la cámara
+    stream.getTracks().forEach(track => track.stop());
+    setStream(null);
+    
+    return imageDataUrl.split(',')[1]; // Retornar solo los datos base64 sin el prefijo
   };
 
   // Función para registrar el rostro con Face++
   const handleFacialRegistration = async () => {
-    try {
-      if (!formData.correo || !formData.nombres) {
-        setError('Por favor complete el correo y nombres antes del registro facial');
-        return;
-      }
+    if (!formData.correo || !formData.nombres) {
+      setError('Por favor complete el correo y nombres antes del registro facial');
+      return;
+    }
 
-      // 1. Capturar imagen
-      const imageBase64 = await captureImage();
+    try {
+      // Primer paso: iniciar la cámara si no está iniciada
+      if (!stream) {
+        await startCamera();
+        return; // Salir para esperar a que la cámara se inicialice
+      }
       
-      // 2. Detectar rostro y crear FaceToken con Face++
+      // Si la cámara ya está activa, tomar la foto
+      const imageBase64 = takePhoto();
+      if (!imageBase64) {
+        throw new Error("No se pudo capturar la imagen");
+      }
+      
+      setIsCapturing(true);
+      
+      // Detectar rostro con Face++
+      console.log("Enviando imagen a Face++ para detección...");
       const detectResponse = await fetch(`${FACE_API_ENDPOINT}/detect`, {
         method: 'POST',
         headers: {
@@ -155,6 +150,7 @@ const Registrate = () => {
       });
       
       const detectData = await detectResponse.json();
+      console.log("Respuesta de Face++:", detectData);
       
       if (!detectData.faces || detectData.faces.length === 0) {
         throw new Error('NO_FACE_DETECTED');
@@ -169,10 +165,12 @@ const Registrate = () => {
       // Guardar FaceToken como identificador único
       setFacialId(faceToken);
       setIsFaceRegistered(true);
+      setIsCapturing(false);
       
       return faceToken;
     } catch (error) {
       console.error("Error en registro facial:", error);
+      setIsCapturing(false);
       handleFaceAPIError(error);
       return null;
     }
@@ -260,11 +258,20 @@ const Registrate = () => {
     }
   };
 
+  // Limpieza al desmontar el componente
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
+
   return (
     <div className="registro-container">
       <div className="registro-form">
         <img 
-          src="../ImagenesP/Logo1.png"
+          src="/ImagenesP/Logo1.png" // Cambiado a URL relativa con / al inicio
           alt="Logo"
           className="logo-image"
         />
@@ -345,7 +352,29 @@ const Registrate = () => {
           
           <div className="form-group facial-auth-section">
             <label>Autenticación Facial</label>
-            <div id="camera-container" className="camera-container"></div>
+            <div id="camera-container" className="camera-container">
+              {!capturedImage && (
+                <video 
+                  ref={videoRef} 
+                  className="camera-preview" 
+                  autoPlay 
+                  playsInline 
+                  muted
+                />
+              )}
+              
+              {capturedImage && (
+                <img 
+                  src={capturedImage} 
+                  alt="Imagen capturada" 
+                  className="captured-image" 
+                />
+              )}
+              
+              {/* Canvas oculto para capturar la imagen */}
+              <canvas ref={canvasRef} style={{ display: 'none' }} />
+            </div>
+            
             <button 
               type="button" 
               onClick={handleFacialRegistration}
@@ -353,8 +382,10 @@ const Registrate = () => {
               disabled={!formData.correo || !formData.nombres || isCapturing}
             >
               {isCapturing ? 'Capturando...' : 
-               isFaceRegistered ? '✓ Rostro Registrado' : 'Registrar mi Rostro'}
+              isFaceRegistered ? '✓ Rostro Registrado' : 
+              stream ? 'Tomar Foto' : 'Registrar mi Rostro'}
             </button>
+            
             <p className="facial-hint">
               Debe permitir el acceso a la cámara para el registro facial
             </p>
