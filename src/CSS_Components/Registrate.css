@@ -122,26 +122,25 @@ input:focus {
 }
 
 .camera-container {
-  width: 100%;
-  height: 300px;
-  background-color: #222;
-  border-radius: 5px;
-  margin-bottom: 15px;
+  min-height: 240px;
+  min-width: 320px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
+  margin-bottom: 1rem;
 }
 
 .camera-preview {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
 }
 
 .captured-image {
   max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  max-height: 300px;
 }
 
 .facial-registration-btn {
@@ -172,6 +171,7 @@ input:focus {
   text-align: center;
   margin-top: 5px;
 }
+
 
 @media (max-width: 768px) {
   .form-row {
