@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { doc, setDoc } from 'firebase/firestore';
 import '../CSS_Components/Registrate.css';
 
+// Configuración de Face++
 const API_KEY = '1vIyyMFsK6fZDEXoqZuqRWzULeD6EW7J';
 const API_SECRET = '7L9iLl8j-z7s9tqmD8n7zRz2ucAtXQf3';
 const FACE_API_ENDPOINT = 'https://api-us.faceplusplus.com/facepp/v3';
@@ -16,6 +18,7 @@ const Registrate = () => {
   const [isCapturing, setIsCapturing] = useState(false);
   const [stream, setStream] = useState(null);
   const [message, setMessage] = useState('');
+  const [imageUrl, setImageUrl] = useState('');
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -28,7 +31,7 @@ const Registrate = () => {
     confirmarContrasena: ''
   });
 
-  // Iniciar la cámara al cargar el componente, similar al código de tus compañeros
+  // Iniciar la cámara al cargar el componente
   useEffect(() => {
     startCamera();
     
@@ -48,7 +51,6 @@ const Registrate = () => {
     }));
   };
 
-  // Función para iniciar la cámara (como en el código de tus compañeros)
   const startCamera = async () => {
     try {
       console.log("Iniciando cámara...");
@@ -148,6 +150,27 @@ const Registrate = () => {
     }
   };
 
+  // Función para guardar los datos del usuario en Firestore
+  const saveUserToFirestore = async (userId, facialData) => {
+    try {
+      const userData = {
+        nombres: formData.nombres,
+        apellidos: formData.apellidos,
+        correo: formData.correo,
+        facialId: facialData.faceToken,
+        imageUrl: facialData.imageUrl, // Guardamos la URL de la imagen
+        createdAt: new Date().toISOString(),
+        lastLogin: null
+      };
+
+      await setDoc(doc(db, "users", userId), userData);
+      console.log("Usuario guardado en Firestore:", userData);
+    } catch (error) {
+      console.error("Error al guardar en Firestore:", error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -181,13 +204,10 @@ const Registrate = () => {
         formData.contrasena
       );
       
-      // 2. En lugar de guardar en Firestore, solo mostramos un mensaje de éxito
-      console.log("Usuario registrado con ID:", userCredential.user.uid);
-      console.log("Datos del usuario:", {
-        nombres: formData.nombres,
-        apellidos: formData.apellidos,
-        correo: formData.correo,
-        facialId: facialId
+      // 2. Guardar datos adicionales en Firestore
+      await saveUserToFirestore(userCredential.user.uid, {
+        faceToken: facialId,
+        imageUrl: imageUrl
       });
       
       // 3. Redirigir al login
@@ -218,10 +238,6 @@ const Registrate = () => {
           src="/ImagenesP/Logo1.png" 
           alt="Logo"
           className="logo-image"
-          onError={(e) => {
-            console.error("Error al cargar la imagen del logo:", e);
-            e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiPlBvbGlUcmFkZTwvdGV4dD48L3N2Zz4="; // Imagen SVG de respaldo
-          }}
         />
         
         <h1>Únete a Poli Trade</h1>
@@ -229,13 +245,8 @@ const Registrate = () => {
           Registro con autenticación facial segura
         </p>
 
-        {error && (
-          <p className="error-message">{error}</p>
-        )}
-        
-        {message && (
-          <p className="success-message">{message}</p>
-        )}
+        {error && <p className="error-message">{error}</p>}
+        {message && <p className="success-message">{message}</p>}
 
         <form onSubmit={handleSubmit}>
           <div className="form-row">
@@ -312,7 +323,12 @@ const Registrate = () => {
                 muted
                 className="camera-preview"
               />
-              <canvas ref={canvasRef} style={{ display: 'none' }} />
+              {imageUrl && (
+                <div className="captured-image-preview">
+                  <img src={imageUrl} alt="Captured face" />
+                  <p>Previsualización de tu rostro</p>
+                </div>
+              )}
             </div>
             
             <button 

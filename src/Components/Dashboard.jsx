@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { auth } from '../firebase';
-import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, where } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, deleteDoc, updateDoc, doc, getDocs, query, where, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import '../CSS_Components/Dashboard.css';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [publicaciones, setPublicaciones] = useState([]);
   const [allPublicaciones, setAllPublicaciones] = useState([]);
   const [busqueda, setBusqueda] = useState('');
@@ -25,12 +26,38 @@ const Dashboard = () => {
         setUser(user);
         cargarPublicaciones();
         cargarTodasLasPublicaciones();
+        cargarPerfilUsuario(user.uid);
       } else {
         navigate('/login');
       }
     });
     return () => unsubscribe();
   }, [navigate]);
+
+  // Nueva función para cargar el perfil del usuario, incluyendo la imagen facial
+  const cargarPerfilUsuario = async (userId) => {
+    try {
+      // Buscar en la colección "usuarios" donde esté almacenado el perfil
+      const userDoc = await getDoc(doc(db, 'usuarios', userId));
+      
+      if (userDoc.exists()) {
+        setUserProfile(userDoc.data());
+      } else {
+        // Buscar por consulta si no se encuentra por ID
+        const userQuery = query(
+          collection(db, 'usuarios'),
+          where('userId', '==', userId)
+        );
+        
+        const querySnapshot = await getDocs(userQuery);
+        if (!querySnapshot.empty) {
+          setUserProfile(querySnapshot.docs[0].data());
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar perfil de usuario:', error);
+    }
+  };
 
   const cargarPublicaciones = async () => {
     try {
@@ -84,6 +111,7 @@ const Dashboard = () => {
     try {
       await deleteDoc(doc(db, 'publicaciones', id));
       cargarPublicaciones();
+      cargarTodasLasPublicaciones();
     } catch (error) {
       console.error('Error al eliminar publicación:', error);
     }
@@ -98,6 +126,7 @@ const Dashboard = () => {
       setEditando(null);
       setNuevaPublicacion({ titulo: '', descripcion: '', precio: '', categoria: '' });
       cargarPublicaciones();
+      cargarTodasLasPublicaciones();
     } catch (error) {
       console.error('Error al actualizar publicación:', error);
     }
@@ -114,7 +143,21 @@ const Dashboard = () => {
       <div className="dashboard-container">
         <div className="dashboard-header">
           <div className="user-welcome">
-            <p>Bienvenido, {user?.email}</p>
+            {/* Sección modificada para mostrar la imagen facial si existe */}
+            <div className="user-profile">
+              {userProfile && userProfile.imagenFacial ? (
+                <img 
+                  src={userProfile.imagenFacial} 
+                  alt="Imagen facial" 
+                  className="user-facial-image" 
+                />
+              ) : (
+                <div className="user-avatar">
+                  {user?.email?.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <p>Bienvenido, {user?.email}</p>
+            </div>
           </div>
           <button onClick={handleCerrarSesion} className="logout-button">
             Cerrar Sesión
