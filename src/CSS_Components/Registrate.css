@@ -1,3 +1,58 @@
+.facial-registration-btn {
+  background-color: #4285f4;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  width: 100%;
+  margin-top: 8px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.facial-registration-btn:hover:not(:disabled) {
+  background-color: #3367d6;
+}
+
+.facial-registration-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.facial-registration-btn.success {
+  background-color: #28a745;
+}
+
+.facial-registration-btn.success:hover {
+  background-color: #218838;
+}
+
+.facial-hint {
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: 4px;
+  text-align: center;
+}
+
+.error-message {
+  color: #dc3545;
+  text-align: center;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f8d7da;
+  border-radius: 4px;
+}
+
+.crear-cuenta-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
 .registro-container {
   min-height: 100vh;
   display: flex;
