@@ -1,44 +1,3 @@
-.facial-registration-btn {
-  background-color: #4285f4;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1rem;
-  width: 100%;
-  margin-top: 8px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.facial-registration-btn:hover:not(:disabled) {
-  background-color: #3367d6;
-}
-
-.facial-registration-btn:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.facial-registration-btn.success {
-  background-color: #28a745;
-}
-
-.facial-registration-btn.success:hover {
-  background-color: #218838;
-}
-
-.facial-hint {
-  font-size: 0.8rem;
-  color: #666;
-  margin-top: 4px;
-  text-align: center;
-}
-
 .error-message {
   color: #dc3545;
   text-align: center;
@@ -72,7 +31,7 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.registro-logo {
+.logo-image {
   width: 100px;
   height: auto;
   display: block;
@@ -157,14 +116,74 @@ input:focus {
   text-decoration: underline;
 }
 
+/* Estilos adicionales para el reconocimiento facial */
+.facial-auth-section {
+  margin-bottom: 30px;
+}
+
+.camera-container {
+  width: 100%;
+  height: 300px;
+  background-color: #222;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.camera-preview {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.captured-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.facial-registration-btn {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(to right, #3498db, #2980b9);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 10px;
+}
+
+.facial-registration-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(to right, #3498db, #2980b9);
+}
+
+.facial-registration-btn.success {
+  background: linear-gradient(to right, #27ae60, #2ecc71);
+}
+
+.facial-hint {
+  color: #aaa;
+  font-size: 0.85rem;
+  text-align: center;
+  margin-top: 5px;
+}
+
 @media (max-width: 768px) {
   .form-row {
     grid-template-columns: 1fr;
     gap: 0;
-    
   }
 
   .registro-form {
     padding: 20px;
+  }
+
+  .camera-container {
+    height: 200px;
   }
 }

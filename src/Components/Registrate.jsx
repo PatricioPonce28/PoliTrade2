@@ -1,15 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
 import '../CSS_Components/Registrate.css';
+
+// Obtener las variables de entorno para la API de Face++
+const FACE_API_KEY = import.meta.env.REACT_APP_FACE_API_KEY;
+const FACE_API_SECRET = import.meta.env.REACT_APP_FACE_API_SECRET;
+const FACE_API_ENDPOINT = import.meta.env.REACT_APP_FACE_API_ENDPOINT || 'https://api-us.faceplusplus.com/facepp/v3';
 
 const Registrate = () => {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [facialId, setFacialId] = useState('');
   const [isFaceRegistered, setIsFaceRegistered] = useState(false);
+  const [isCapturing, setIsCapturing] = useState(false);
+  
   const [formData, setFormData] = useState({
     nombres: '',
     apellidos: '',
@@ -29,22 +35,49 @@ const Registrate = () => {
   // Función para capturar imagen desde la cámara
   const captureImage = async () => {
     try {
+      setIsCapturing(true);
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      const video = document.createElement('video');
-      video.srcObject = stream;
-      await video.play();
+      
+      // Crear elementos para mostrar vista previa
+      const videoPreview = document.createElement('video');
+      videoPreview.srcObject = stream;
+      videoPreview.className = 'camera-preview';
+      
+      const previewContainer = document.getElementById('camera-container');
+      previewContainer.innerHTML = '';
+      previewContainer.appendChild(videoPreview);
+      
+      await videoPreview.play();
+      
+      // Esperar un poco para que la cámara se estabilice
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       const canvas = document.createElement('canvas');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+      canvas.width = videoPreview.videoWidth;
+      canvas.height = videoPreview.videoHeight;
       const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
       
+      // Detener el stream de la cámara
       stream.getTracks().forEach(track => track.stop());
       
+      // Mostrar la imagen capturada
+      const capturedImg = document.createElement('img');
+      capturedImg.src = canvas.toDataURL('image/jpeg');
+      capturedImg.className = 'captured-image';
+      previewContainer.innerHTML = '';
+      previewContainer.appendChild(capturedImg);
+      
+      setIsCapturing(false);
       return canvas.toDataURL('image/jpeg').split(',')[1]; // Devuelve base64 sin el prefijo
     } catch (error) {
+      setIsCapturing(false);
       console.error("Error al capturar imagen:", error);
+      
+      if (error.name === 'NotAllowedError') {
+        throw new Error('PERMISSION_REFUSED');
+      }
+      
       throw error;
     }
   };
@@ -60,9 +93,12 @@ const Registrate = () => {
       // 1. Capturar imagen
       const imageBase64 = await captureImage();
       
-      // 2. Detectar rostro y crear FaceToken
+      // 2. Detectar rostro y crear FaceToken con Face++
       const detectResponse = await fetch(`${FACE_API_ENDPOINT}/detect`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
         body: new URLSearchParams({
           api_key: FACE_API_KEY,
           api_secret: FACE_API_SECRET,
@@ -84,8 +120,7 @@ const Registrate = () => {
       
       const faceToken = detectData.faces[0].face_token;
       
-      // 3. Crear FaceSet (opcional, para agrupar rostros)
-      // 4. Guardar FaceToken como identificador único
+      // Guardar FaceToken como identificador único
       setFacialId(faceToken);
       setIsFaceRegistered(true);
       
@@ -100,34 +135,16 @@ const Registrate = () => {
   const handleFaceAPIError = (error) => {
     switch(error.message) {
       case 'NO_FACE_DETECTED':
-        setError('No se detectó ningún rostro');
+        setError('No se detectó ningún rostro. Asegúrese de estar bien iluminado y mirando a la cámara.');
         break;
       case 'MULTIPLE_FACES':
-        setError('Se detectó más de un rostro');
+        setError('Se detectó más de un rostro. Por favor, asegúrese de ser la única persona en la imagen.');
         break;
       case 'PERMISSION_REFUSED':
-        setError('Permiso de cámara denegado');
+        setError('Permiso de cámara denegado. Por favor, permita el acceso a la cámara.');
         break;
       default:
         setError('Error en registro facial: ' + error.toString());
-    }
-  };
-
-  // Función para guardar datos en Firestore
-  const saveUserData = async (userId, facialId) => {
-    try {
-      await setDoc(doc(db, "users", userId), {
-        nombres: formData.nombres,
-        apellidos: formData.apellidos,
-        correo: formData.correo,
-        facialId: facialId,
-        createdAt: new Date().toISOString(),
-        lastLogin: null
-      });
-      console.log("Datos de usuario guardados en Firestore");
-    } catch (error) {
-      console.error("Error guardando datos en Firestore:", error);
-      throw error;
     }
   };
 
@@ -136,8 +153,18 @@ const Registrate = () => {
     setError('');
 
     // Validaciones
+    if (!formData.nombres || !formData.apellidos || !formData.correo || !formData.contrasena) {
+      setError('Todos los campos son obligatorios');
+      return;
+    }
+
     if (formData.contrasena !== formData.confirmarContrasena) {
       setError('Las contraseñas no coinciden');
+      return;
+    }
+
+    if (formData.contrasena.length < 6) {
+      setError('La contraseña debe tener al menos 6 caracteres');
       return;
     }
 
@@ -154,8 +181,14 @@ const Registrate = () => {
         formData.contrasena
       );
       
-      // 2. Guardar datos adicionales en Firestore
-      await saveUserData(userCredential.user.uid, facialId);
+      // 2. En lugar de guardar en Firestore, solo mostramos un mensaje de éxito
+      console.log("Usuario registrado con ID:", userCredential.user.uid);
+      console.log("Datos del usuario:", {
+        nombres: formData.nombres,
+        apellidos: formData.apellidos,
+        correo: formData.correo,
+        facialId: facialId
+      });
       
       // 3. Redirigir al login
       navigate('/login');
@@ -200,17 +233,81 @@ const Registrate = () => {
         )}
 
         <form onSubmit={handleSubmit}>
-          {/* ... (resto del formulario permanece igual) ... */}
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="nombres">Nombres</label>
+              <input
+                type="text"
+                id="nombres"
+                name="nombres"
+                value={formData.nombres}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="apellidos">Apellidos</label>
+              <input
+                type="text"
+                id="apellidos"
+                name="apellidos"
+                value={formData.apellidos}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
           
           <div className="form-group">
+            <label htmlFor="correo">Correo Electrónico</label>
+            <input
+              type="email"
+              id="correo"
+              name="correo"
+              value={formData.correo}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="contrasena">Contraseña</label>
+              <input
+                type="password"
+                id="contrasena"
+                name="contrasena"
+                value={formData.contrasena}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="confirmarContrasena">Confirmar Contraseña</label>
+              <input
+                type="password"
+                id="confirmarContrasena"
+                name="confirmarContrasena"
+                value={formData.confirmarContrasena}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="form-group facial-auth-section">
             <label>Autenticación Facial</label>
+            <div id="camera-container" className="camera-container"></div>
             <button 
               type="button" 
               onClick={handleFacialRegistration}
               className={`facial-registration-btn ${isFaceRegistered ? 'success' : ''}`}
-              disabled={!formData.correo || !formData.nombres}
+              disabled={!formData.correo || !formData.nombres || isCapturing}
             >
-              {isFaceRegistered ? '✓ Rostro Registrado' : 'Registrar mi Rostro'}
+              {isCapturing ? 'Capturando...' : 
+               isFaceRegistered ? '✓ Rostro Registrado' : 'Registrar mi Rostro'}
             </button>
             <p className="facial-hint">
               Debe permitir el acceso a la cámara para el registro facial
