@@ -1,10 +1,9 @@
 .error-message {
-  color: #dc3545;
-  text-align: center;
-  margin: 10px 0;
+  color: #f44336;
+  background-color: #ffebee;
   padding: 10px;
-  background-color: #f8d7da;
   border-radius: 4px;
+  margin-bottom: 15px;
 }
 
 .crear-cuenta-btn:disabled {
@@ -122,8 +121,8 @@ input:focus {
 }
 
 .camera-container {
-  min-height: 240px;
   width: 100%;
+  height: 240px;
   background-color: #f0f0f0;
   border: 1px solid #ccc;
   display: flex;
@@ -138,44 +137,50 @@ input:focus {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  background-color: #000;
   display: block;
 }
 
 .captured-image {
   max-width: 100%;
-  max-height: 100%;
+  max-height: 240px;
   display: block;
   margin: 0 auto;
 }
 
 .facial-registration-btn {
   width: 100%;
-  padding: 12px;
-  background: linear-gradient(to right, #3498db, #2980b9);
+  padding: 10px;
+  background-color: #2196F3;
   color: white;
   border: none;
-  border-radius: 5px;
-  font-size: 1rem;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  margin-bottom: 10px;
+  margin-top: 10px;
+  transition: background-color 0.3s;
 }
 
 .facial-registration-btn:hover {
-  transform: translateY(-2px);
-  background: linear-gradient(to right, #3498db, #2980b9);
+  background-color: #0b7dda;
+}
+
+.facial-registration-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .facial-registration-btn.success {
-  background: linear-gradient(to right, #27ae60, #2ecc71);
+  background-color: #4CAF50;
 }
 
 .facial-hint {
-  color: #aaa;
-  font-size: 0.85rem;
-  text-align: center;
+  font-size: 0.8rem;
+  color: #666;
   margin-top: 5px;
+  text-align: center;
 }
+
+
 
 
 @media (max-width: 768px) {

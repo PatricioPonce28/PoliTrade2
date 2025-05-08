@@ -29,6 +29,40 @@ const Registrate = () => {
     confirmarContrasena: ''
   });
 
+  // Solicitar acceso a la cámara automáticamente cuando el componente se monta
+  useEffect(() => {
+    const requestCameraPermission = async () => {
+      try {
+        console.log("Solicitando permiso de cámara automáticamente al cargar...");
+        // Esto desencadenará el diálogo de permisos
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            facingMode: "user"
+          }
+        });
+        console.log("Permiso de cámara concedido");
+        
+        // Inmediatamente detener el stream para no consumir recursos
+        mediaStream.getTracks().forEach(track => track.stop());
+      } catch (err) {
+        console.log("Error al solicitar permiso de cámara:", err);
+        // No mostramos error aquí, se manejará cuando el usuario intente usar la cámara
+      }
+    };
+    
+    // Llamar a la función cuando el componente se monta
+    requestCameraPermission();
+    
+    // Limpiar al desmontar
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
@@ -49,6 +83,12 @@ const Registrate = () => {
     
     try {
       console.log("Solicitando acceso a la cámara...");
+      
+      // Detener cualquier stream existente
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           width: { ideal: 640 },
@@ -57,10 +97,26 @@ const Registrate = () => {
         }
       });
       
+      // IMPORTANTE: Asegurarse de que el elemento de video existe
       if (videoRef.current) {
+        // Asignar el stream
         videoRef.current.srcObject = mediaStream;
-        setStream(mediaStream);
-        console.log("Cámara iniciada correctamente");
+        
+        // Esperar a que el video esté listo antes de intentar reproducirlo
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current.play()
+            .then(() => {
+              console.log("Video reproduciendo correctamente");
+              setStream(mediaStream);
+            })
+            .catch(err => {
+              console.error("Error al reproducir video:", err);
+              setError('Error al iniciar la cámara: no se pudo reproducir video');
+              setIsCapturing(false);
+            });
+        };
+        
+        console.log("Stream asignado al elemento de video");
       } else {
         console.error("Elemento de video no encontrado");
         throw new Error("Elemento de video no encontrado");
@@ -92,23 +148,33 @@ const Registrate = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     
-    // Establecer dimensiones del canvas según el video
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    
-    // Dibujar el frame actual del video en el canvas
-    const context = canvas.getContext('2d');
-    context.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
-    // Obtener la imagen como base64
-    const imageDataUrl = canvas.toDataURL('image/jpeg');
-    setCapturedImage(imageDataUrl);
-    
-    // Detener el stream de la cámara
-    stream.getTracks().forEach(track => track.stop());
-    setStream(null);
-    
-    return imageDataUrl.split(',')[1]; // Retornar solo los datos base64 sin el prefijo
+    try {
+      // Establecer dimensiones del canvas según el video
+      canvas.width = video.videoWidth || 640;
+      canvas.height = video.videoHeight || 480;
+      
+      console.log(`Dimensiones del video: ${video.videoWidth}x${video.videoHeight}`);
+      console.log(`Dimensiones del canvas: ${canvas.width}x${canvas.height}`);
+      
+      // Dibujar el frame actual del video en el canvas
+      const context = canvas.getContext('2d');
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+      
+      // Obtener la imagen como base64
+      const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9); // 0.9 = 90% de calidad
+      setCapturedImage(imageDataUrl);
+      
+      // Detener el stream de la cámara
+      stream.getTracks().forEach(track => track.stop());
+      setStream(null);
+      
+      console.log("Imagen capturada exitosamente");
+      
+      return imageDataUrl.split(',')[1]; // Retornar solo los datos base64 sin el prefijo
+    } catch (err) {
+      console.error("Error al capturar foto:", err);
+      return null;
+    }
   };
 
   // Función para registrar el rostro con Face++
@@ -258,22 +324,17 @@ const Registrate = () => {
     }
   };
 
-  // Limpieza al desmontar el componente
-  useEffect(() => {
-    return () => {
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [stream]);
-
   return (
     <div className="registro-container">
       <div className="registro-form">
         <img 
-          src="/ImagenesP/Logo1.png" // Cambiado a URL relativa con / al inicio
+          src="/ImagenesP/Logo1.png" 
           alt="Logo"
           className="logo-image"
+          onError={(e) => {
+            console.error("Error al cargar la imagen del logo:", e);
+            e.target.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iIzMzMyIvPjx0ZXh0IHg9IjUwIiB5PSI1MCIgZm9udC1mYW1pbHk9IkFyaWFsIiBmb250LXNpemU9IjE0IiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgYWxpZ25tZW50LWJhc2VsaW5lPSJtaWRkbGUiPlBvbGlUcmFkZTwvdGV4dD48L3N2Zz4="; // Imagen SVG de respaldo
+          }}
         />
         
         <h1>Únete a Poli Trade</h1>
@@ -352,7 +413,7 @@ const Registrate = () => {
           
           <div className="form-group facial-auth-section">
             <label>Autenticación Facial</label>
-            <div id="camera-container" className="camera-container">
+            <div className="camera-container">
               {!capturedImage && (
                 <video 
                   ref={videoRef} 
@@ -360,6 +421,12 @@ const Registrate = () => {
                   autoPlay 
                   playsInline 
                   muted
+                  style={{
+                    width: '100%',
+                    height: '240px',
+                    backgroundColor: '#000',
+                    objectFit: 'cover'
+                  }}
                 />
               )}
               
@@ -368,6 +435,10 @@ const Registrate = () => {
                   src={capturedImage} 
                   alt="Imagen capturada" 
                   className="captured-image" 
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '240px'
+                  }}
                 />
               )}
               
