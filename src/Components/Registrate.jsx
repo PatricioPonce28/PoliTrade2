@@ -36,48 +36,94 @@ const Registrate = () => {
   const captureImage = async () => {
     try {
       setIsCapturing(true);
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      console.log("Solicitando acceso a la cámara...");
+      
+      // Especificar más opciones para la cámara
+      const constraints = {
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          facingMode: "user"  // Cámara frontal
+        }
+      };
+      
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log("Acceso a la cámara concedido:", stream);
       
       // Crear elementos para mostrar vista previa
       const videoPreview = document.createElement('video');
       videoPreview.srcObject = stream;
       videoPreview.className = 'camera-preview';
+      videoPreview.setAttribute('autoplay', 'true');
+      videoPreview.setAttribute('playsinline', 'true');  // Importante para iOS
       
       const previewContainer = document.getElementById('camera-container');
+      if (!previewContainer) {
+        console.error("No se encontró el contenedor de la cámara");
+        throw new Error('CONTAINER_NOT_FOUND');
+      }
+      
       previewContainer.innerHTML = '';
       previewContainer.appendChild(videoPreview);
       
-      await videoPreview.play();
-      
-      // Esperar un poco para que la cámara se estabilice
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const canvas = document.createElement('canvas');
-      canvas.width = videoPreview.videoWidth;
-      canvas.height = videoPreview.videoHeight;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
-      
-      // Detener el stream de la cámara
-      stream.getTracks().forEach(track => track.stop());
-      
-      // Mostrar la imagen capturada
-      const capturedImg = document.createElement('img');
-      capturedImg.src = canvas.toDataURL('image/jpeg');
-      capturedImg.className = 'captured-image';
-      previewContainer.innerHTML = '';
-      previewContainer.appendChild(capturedImg);
-      
-      setIsCapturing(false);
-      return canvas.toDataURL('image/jpeg').split(',')[1]; // Devuelve base64 sin el prefijo
+      // Esperar a que el video se cargue
+      return new Promise((resolve) => {
+        videoPreview.onloadedmetadata = async () => {
+          try {
+            await videoPreview.play();
+            console.log("Video reproduciendo correctamente");
+            
+            // Esperar un poco para que la cámara se estabilice
+            await new Promise(resolveTimer => setTimeout(resolveTimer, 1000));
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = videoPreview.videoWidth;
+            canvas.height = videoPreview.videoHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(videoPreview, 0, 0, canvas.width, canvas.height);
+            
+            // Detener el stream de la cámara
+            stream.getTracks().forEach(track => track.stop());
+            
+            // Mostrar la imagen capturada
+            const capturedImg = document.createElement('img');
+            capturedImg.src = canvas.toDataURL('image/jpeg');
+            capturedImg.className = 'captured-image';
+            previewContainer.innerHTML = '';
+            previewContainer.appendChild(capturedImg);
+            
+            setIsCapturing(false);
+            console.log("Imagen capturada exitosamente");
+            resolve(canvas.toDataURL('image/jpeg').split(',')[1]);
+          } catch (error) {
+            console.error("Error durante la captura:", error);
+            setIsCapturing(false);
+            throw error;
+          }
+        };
+        
+        videoPreview.onerror = (error) => {
+          console.error("Error al cargar el video:", error);
+          setIsCapturing(false);
+          throw error;
+        };
+      });
     } catch (error) {
       setIsCapturing(false);
       console.error("Error al capturar imagen:", error);
       
       if (error.name === 'NotAllowedError') {
+        alert('Permiso de cámara denegado. Por favor, permita el acceso a la cámara.');
         throw new Error('PERMISSION_REFUSED');
+      } else if (error.name === 'NotFoundError') {
+        alert('No se ha encontrado cámara en este dispositivo.');
+        throw new Error('CAMERA_NOT_FOUND');
+      } else if (error.name === 'NotReadableError') {
+        alert('La cámara está siendo utilizada por otra aplicación.');
+        throw new Error('CAMERA_IN_USE');
       }
       
+      alert('Error al acceder a la cámara: ' + error.message);
       throw error;
     }
   };
